@@ -2,7 +2,7 @@
 
 The python scripts along with test mazes for this project includes the following files:
 
-* robot.py: This script establishes the robot class. This is the only script I have modi- fied.
+* robot.py: This script establishes the robot class. This is the only script I have modified.
 * maze.py: The provided script contains functions for constructing the maze and for checking for walls upon robot movement or sensing.
 * tester.py: The provided script runs to test the robot’s ability to navigate mazes.
 * showmaze.py: The provided script is used to create a visual demonstration of what a maze looks like.
