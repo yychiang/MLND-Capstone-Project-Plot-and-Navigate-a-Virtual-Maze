@@ -10,40 +10,57 @@ class Robot(object):
         '''
         self.run=0
         self.init = [0,0]
-        self.x=self.init[0]
-        self.y=self.init[1]
 
+        # setup the initial location
+        self.x=self.init[0] 
+        self.y=self.init[1]
+        
+        # record the previous location, used by run-2
         self.prevX=0
         self.prevY=0
 
+        # setup the goal of the maze
         self.goal_bounds = [maze_dim/2 - 1, maze_dim/2]
 
-        
+        # setup the heading of the maze
         self.heading = 'up'
+
+        # setup the dimension of the maze
         self.maze_dim = maze_dim
 
         self.cost = 1
-        self.delta = [(0,1), # go up
-                     (1,0), # go right
-                     (0,-1), # go down
-                     (-1,0)] # go left
-        self.delta_name = ['^', '>', 'v', '<']
+
+        # self.delta = [(0,1), # go up
+        #              (1,0), # go right
+        #              (0,-1), # go down
+        #              (-1,0)] # go left
+        # self.delta_name = ['^', '>', 'v', '<']
 
         self.delta = [(1,0), # go right
                      (0,1), # go up
                      (0,-1), # go down
                      (-1,0)] # go left
+        # Remark: the order of delta is related to the order of direction the robot to navigate
+
 
         self.delta_name = ['>', '^', 'v', '<']
 
+        # self.closed is matrix to record which positions of the maze have been visited
         self.closed=[[0 for col in range(maze_dim)] for row in range(maze_dim)]
         self.closed[self.init[0]][self.init[1]]=1
-        self.expand=[[-1 for i in range(maze_dim)] for j in range(maze_dim)] 
+        # self.expand=[[-1 for i in range(maze_dim)] for j in range(maze_dim)] 
         self.action=[[-1]*maze_dim for i in range(maze_dim)]
+
+        # Here I define a function called one_norm, which is used to generate a 
+        # Heuristic Matrix for A-star search
         def one_norm(a,b):
             d=abs(a[0]-b[0])+abs(a[1]-b[1])
             return d
+
+        # initialize the heuristic matrix
         self.heuristic=[[0 for col in range(maze_dim)] for row in range(maze_dim)]
+
+        #The 1st heuristic matrix, H1
         for i in range(maze_dim):
             for j in range(maze_dim):
                 self.heuristic[i][j]=min(one_norm((i,j),(maze_dim/2-1,maze_dim/2-1)),
@@ -51,27 +68,53 @@ class Robot(object):
                                    one_norm((i,j),(maze_dim/2,maze_dim/2-1)),
                                    one_norm((i,j),(maze_dim/2,maze_dim/2)))
 
+        
+
+        # heuristic=[[30, 29, 28, 27, 26, 25, 24, 25, 24, 25, 24, 23],
+        #  [25, 26, 27, 24, 23, 24, 23, 24, 23, 22, 21, 22],
+        #  [24, 25, 28, 25, 22, 21, 22, 23, 18, 19, 20, 21],
+        #  [23, 26, 27, 26, 19, 20, 21, 22, 17, 16, 15, 14],
+        #  [22, 21, 20, 19, 18, 17, 16, 15, 14, 15, 14, 13],
+        #  [19, 20, 19, 20, 19, 0, 0, 14, 13, 12, 13, 12],
+        #  [18, 17, 18, 19, 20, 0, 0, 13, 12, 11, 12, 11],
+        #  [15, 16, 17, 18, 5, 2, 1, 2, 11, 10, 9, 10],
+        #  [14, 15, 6, 5, 4, 3, 4, 3, 4, 9, 8, 11],
+        #  [13, 14, 15, 6, 5, 6, 5, 6, 5, 6, 7, 12],
+        #  [12, 13, 14, 7, 10, 7, 8, 9, 6, 7, 8, 9],
+        #  [11, 10, 9, 8, 9, 10, 11, 10, 7, 8, 9, 10]]
+
+        # heuristic=[
+        # [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        # [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+        # [2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
+        # [3,3,3,3,3,3,3,3,3,3,3,3,3,2,1,0],
+        # [4,4,4,4,4,4,4,4,4,4,4,4,3,2,1,0],
+        # [5,5,5,5,5,5,5,5,5,5,5,4,3,2,1,0],
+        # [6,6,6,6,6,6,6,6,6,6,5,4,3,2,1,0],
+        # [7,7,7,7,7,7,7,7,7,6,5,4,3,2,1,0],
+        # [8,8,8,8,8,8,8,8,7,6,5,4,3,2,1,0],
+        # [ 9, 9, 9, 9, 9, 9,9,8,7,6,5,4,3,2,1,0],
+        # [10,10,10,10,10,10,9,8,7,6,5,4,3,2,1,0],
+        # [11,11,11,11,11,10,9,8,7,6,5,4,3,2,1,0],
+        # [12,12,12,12,11,10,9,8,7,6,5,4,3,2,1,0],
+        # [13,13,13,12,11,10,9,8,7,6,5,4,3,2,1,0],
+        # [14,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0],
+        # [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0]
+        # ]
+
         # for i in range(maze_dim):
         #     for j in range(maze_dim):
         #         self.heuristic[i][j]=j
 
-        heuristic=[[30, 29, 28, 27, 26, 25, 24, 25, 24, 25, 24, 23],
-         [25, 26, 27, 24, 23, 24, 23, 24, 23, 22, 21, 22],
-         [24, 25, 28, 25, 22, 21, 22, 23, 18, 19, 20, 21],
-         [23, 26, 27, 26, 19, 20, 21, 22, 17, 16, 15, 14],
-         [22, 21, 20, 19, 18, 17, 16, 15, 14, 15, 14, 13],
-         [19, 20, 19, 20, 19, 0, 0, 14, 13, 12, 13, 12],
-         [18, 17, 18, 19, 20, 0, 0, 13, 12, 11, 12, 11],
-         [15, 16, 17, 18, 5, 2, 1, 2, 11, 10, 9, 10],
-         [14, 15, 6, 5, 4, 3, 4, 3, 4, 9, 8, 11],
-         [13, 14, 15, 6, 5, 6, 5, 6, 5, 6, 7, 12],
-         [12, 13, 14, 7, 10, 7, 8, 9, 6, 7, 8, 9],
-         [11, 10, 9, 8, 9, 10, 11, 10, 7, 8, 9, 10]]
+        # for i in range(maze_dim):
+        #     for j in range(maze_dim):
+        #         self.heuristic[i][j]=j
 
 
-        for i in range(maze_dim):
-            for j in range(maze_dim):
-                self.heuristic[i][j]=j
+        # for i in range(maze_dim):
+        #     for j in range(maze_dim):
+        #         print(self.heuristic[i][j])
+        #     print('\n')
 
 
         self.policy=[[' ']* self.maze_dim for i in range(self.maze_dim)]
@@ -128,7 +171,7 @@ class Robot(object):
                 return True
             else:
                 return False
-        def add(a,b):
+        def add(a,b): # For adding two tuples
             # a, b, c are tuples
             c=(a[0]+b[0],a[1]+b[1])
             return c
@@ -196,7 +239,8 @@ class Robot(object):
 
         
         def isReasonableStep(x,y,delta):
-            #check whether from (x,y) moves delta (e.g., (0,-1),(1,0),etc.) is a reasonable step
+            # check whether from (x,y) moves delta (e.g., (0,-1),(1,0),etc.) is a 
+            # reasonable step
             result=False
             x2=x+delta[0]
             y2=y+delta[1]
@@ -316,13 +360,10 @@ class Robot(object):
                 rotation='Reset'
                 movement='Reset'
                 goal=[(self.x,self.y)]
-                #print("goal[0]=",goal[0])
 
-                
-                #print(policy)
                 a=goal[0][0]
                 b=goal[0][1]
-                #print("(a,b)=",(a,b))
+
                 self.policy[a][b]='*'
                 while a != self.init[0] or b != self.init[1]:
                     a2=a-self.delta[self.action[a][b]][0]
@@ -332,13 +373,15 @@ class Robot(object):
                     b=b2
 
                 # reset position and heading of the robot
+                # for run-2
                 x2=0
                 y2=0
                 self.heading='up'
+
+
                 self.run=1
                 
-                #for row in policy:
-                #    print row
+                
             else:
                 if not self.onBacktracking:
                     fval_index_tuple=[] 
@@ -367,7 +410,8 @@ class Robot(object):
                         self.path.append(rotation)
                         self.needBacktrack=False
                     
-                # backtracking
+                # needBacktrack means the robot get into dead-end, when
+                # backtracking, there are two actions: move and rotate
                 if self.needBacktrack==True:
                     if self.bkMoveReady==False: #move
                         movement=-1
