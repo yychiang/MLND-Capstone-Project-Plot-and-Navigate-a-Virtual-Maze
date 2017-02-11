@@ -11,4 +11,4 @@ The python scripts along with test mazes for this project includes the following
 
 The report is: report.pdf
 
-Nanodegree Certification: certificate.pdf & nano-grad-cert.pdf
+Nanodegree Certification: certificate.pdf & nd-grad-cert.pdf
