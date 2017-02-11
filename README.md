@@ -10,4 +10,5 @@ The python scripts along with test mazes for this project includes the following
 * test_maze_04.txt: The 12x12 maze which is designed by myself for testing the robustness of my robot.
 
 The report is: report.pdf
+
 Nanodegree Certification: certificate.pdf & nano-grad-cert.pdf
