@@ -11,4 +11,7 @@ The python scripts along with test mazes for this project includes the following
 
 The report is: report.pdf
 
-Nanodegree Certification: certificate.pdf & nd-grad-cert.pdf
+Nanodegree Certification: 
+
+* Co-created by Google: certificate.pdf
+* Co-created by Kaggle: nd-grad-cert.pdf
